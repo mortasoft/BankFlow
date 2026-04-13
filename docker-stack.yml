@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=SecurePassword123!
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager # Forzamos la DB al manager para persistencia local
+      restart_policy:
+        condition: on-failure
+  redis:
+    image: redis:alpine
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+  backend:
+    image: <tu-usuario>/bankflow-backend:latest
+    environment:
+      - DB_HOST=db
+      - DB_NAME=BankFlowDB
+      - DB_USER=sa
+      - DB_PASSWORD=SecurePassword123!
+      - REDIS_HOST=redis
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+  frontend:
+    image: <tu-usuario>/bankflow-frontend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - API_BASE=http://<IP_PUBLICA_MANAGER>:8013/api
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: any
+volumes:
+  sqlserver_data:

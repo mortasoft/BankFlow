@@ -1,0 +1,5 @@
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'BankFlowDB')
+BEGIN
+  CREATE DATABASE BankFlowDB;
+END
+GO
