@@ -37,7 +37,7 @@ services:
   frontend:
     image: <tu-usuario>/bankflow-frontend:latest
     ports:
-      - "3000:3000"
+      - "3000:80"
     environment:
       - API_BASE=http://<IP_PUBLICA_MANAGER>:8013/api
     deploy:
